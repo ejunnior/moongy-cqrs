@@ -27,12 +27,6 @@ namespace Logic.Students
         public string Name { get; set; }
         public Enrollment SecondEnrollment => GetEnrollment(1);
 
-        public void AddDisenrollmentComment(Enrollment enrollment, string comment)
-        {
-            var disenrollment = new Disenrollment(enrollment.Student, enrollment.Course, comment);
-            _disenrollments.Add(disenrollment);
-        }
-
         public void Enroll(Course course, Grade grade)
         {
             if (_enrollments.Count >= 2)
@@ -42,17 +36,20 @@ namespace Logic.Students
             _enrollments.Add(enrollment);
         }
 
-        public void RemoveEnrollment(Enrollment enrollment)
-        {
-            _enrollments.Remove(enrollment);
-        }
-
-        private Enrollment GetEnrollment(int index)
+        public Enrollment GetEnrollment(int index)
         {
             if (_enrollments.Count > index)
                 return _enrollments[index];
 
             return null;
+        }
+
+        public void RemoveEnrollment(Enrollment enrollment, string comment)
+        {
+            _enrollments.Remove(enrollment);
+
+            var disenrollment = new Disenrollment(enrollment.Student, enrollment.Course, comment);
+            _disenrollments.Add(disenrollment);
         }
     }
 }
