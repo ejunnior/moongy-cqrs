@@ -1,5 +1,11 @@
 ﻿namespace Api.Dtos
 {
+    public sealed class EditPersonalInfoDto
+    {
+        public string Email { get; set; }
+        public string Name { get; set; }
+    }
+
     public sealed class StudentDisEnrollmentDto
     {
         public string Comment { get; set; }

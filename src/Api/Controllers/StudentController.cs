@@ -8,18 +8,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
+    using FluentNHibernate.Utils;
+
     [Route("api/students")]
     public sealed class StudentController : BaseController
     {
         private readonly CourseRepository _courseRepository;
+        private readonly IDispatcher _dispatcher;
         private readonly StudentRepository _studentRepository;
         private readonly UnitOfWork _unitOfWork;
 
-        public StudentController(UnitOfWork unitOfWork)
+        public StudentController(
+            UnitOfWork unitOfWork,
+            IDispatcher dispatcher)
         {
             _unitOfWork = unitOfWork;
             _studentRepository = new StudentRepository(unitOfWork);
             _courseRepository = new CourseRepository(unitOfWork);
+            _dispatcher = dispatcher;
         }
 
         [HttpDelete("{id}")]
@@ -61,17 +67,13 @@ namespace Api.Controllers
         [HttpPut("{id}")]
         public IActionResult EditPersonalInfo(long id, [FromBody] EditPersonalInfoDto dto)
         {
-            Student student = _studentRepository.GetById(id);
-            if (student == null)
-                return Error($"No student found for Id {id}");
-
-            student.Name = dto.Name;
-            student.Email = dto.Email;
-
-            Enrollment firstEnrollment = student.FirstEnrollment;
-            Enrollment secondEnrollment = student.SecondEnrollment;
-
-            _unitOfWork.Commit();
+            _dispatcher
+                .Dispatch(new EditPersonalInfoCommand
+                {
+                    Id = id,
+                    Email = dto.Email,
+                    Name = dto.Name
+                });
 
             return Ok();
         }
